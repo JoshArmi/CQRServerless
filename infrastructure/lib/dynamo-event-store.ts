@@ -1,7 +1,7 @@
 import * as core from '@aws-cdk/core';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
 
-export class EventStore extends core.Stack {
+export class DynamoEventStore extends core.Stack {
   eventStore: dynamodb.Table;
 
   constructor(scope: core.Construct, id: string) {
