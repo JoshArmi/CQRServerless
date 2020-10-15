@@ -1,7 +1,6 @@
 import * as core from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
-import * as t from 'io-ts';
 
 type AccountProps = {
   eventStore: dynamodb.Table;
