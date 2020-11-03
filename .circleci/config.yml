@@ -1,8 +1,15 @@
 version: 2.1
 orbs:
-  node: circleci/node@3.0.0
+  node: circleci/node@4.1.0
+jobs:
+  install-deps:
+    steps:
+      - checkout
+      - node/install-packages:
+          override-ci-command: npm install --dev
+      - run: node --version
 workflows:
-  node-tests:
+  test_my_app:
     jobs:
-      - node/test
+      - install-deps
 
