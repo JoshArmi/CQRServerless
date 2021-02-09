@@ -22,9 +22,12 @@
         "cdk": "cdk"
     },
     "dependencies": {
+        "@aws-cdk/aws-codebuild": "^1.68.0",
         "@aws-cdk/aws-dynamodb": "^1.60.0",
-        "@aws-cdk/aws-ec2": "^1.66.0",
+        "@aws-cdk/aws-ec2": "^1.68.0",
         "@aws-cdk/aws-lambda": "^1.60.0",
+        "@aws-cdk/aws-rds": "^1.68.0",
+        "@aws-cdk/aws-secretsmanager": "^1.68.0",
         "@aws-cdk/core": "^1.47.0",
         "@types/aws-lambda": "^8.10.61",
         "@types/uuid": "^8.0.1",
