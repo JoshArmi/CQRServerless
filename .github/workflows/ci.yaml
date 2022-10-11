@@ -1,4 +1,4 @@
-name: !Cidr
+name: continuous_integration
 on:
   push:
 jobs:
