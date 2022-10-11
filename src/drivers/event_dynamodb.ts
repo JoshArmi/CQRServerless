@@ -41,7 +41,8 @@ export const storeEvents: StoreEvents = async (events: Event[], storeName: strin
 
 const convertToEvent = (item: AttributeMap): Either<Error, Event> => {
   const event = Event.decode(item);
-  return isRight(event) ? right(event.right) : left(new Error(''));
+  console.log(event)
+  return isRight(event) ? right(event.right) : left(new Error('Could not decode item'));
 };
 
 export const getAggregateEvents: GetAggregateEvents = (
@@ -59,15 +60,11 @@ export const getAggregateEvents: GetAggregateEvents = (
     })
     .promise()
     .then((response) => {
-      if (response.Items) {
-        return right(
-          response.Items.map(convertToEvent)
-            .filter(isRight)
-            .map((item) => item.right),
-        );
-      } else {
-        return right([]);
-      }
+      return right(
+        response.Items!.map(convertToEvent)
+          .filter(isRight)
+          .map((item) => item.right),
+      );
     });
 };
 
@@ -80,14 +77,10 @@ export const getAllEvents: GetAllEvents = (storeName: string): Promise<Either<Er
     })
     .promise()
     .then((response) => {
-      if (response.Items) {
-        return right(
-          response.Items.map(convertToEvent)
-            .filter(isRight)
-            .map((item) => item.right),
-        );
-      } else {
-        return right([]);
-      }
+      return right(
+        response.Items!.map(convertToEvent)
+          .filter(isRight)
+          .map((item) => item.right),
+      );
     });
 };

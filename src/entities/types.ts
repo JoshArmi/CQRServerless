@@ -1,11 +1,9 @@
 import * as t from 'io-ts';
 
-export const Account = t.intersection([
-  t.type({
+export const Account = t.type({
     version: t.number,
-  }),
-  t.partial({ aggregateId: t.string, name: t.string, amount: t.number }),
-]);
+    aggregateId: t.string, name: t.string, amount: t.number
+  })
 export type Account = t.TypeOf<typeof Account>;
 export const CreateAccount = t.type(
   {
@@ -24,6 +22,8 @@ export type DepositMoney = t.TypeOf<typeof DepositMoney>;
 
 export type AccountCommands = CreateAccount | DepositMoney;
 
+export type Command = AccountCommands
+
 export const BaseEvent = t.type(
   {
     aggregateId: t.string,
@@ -39,7 +39,6 @@ export const AccountCreated = t.intersection([
     {
       eventType: t.literal('ACCOUNT_CREATED'),
       metadata: t.type({
-        amount: t.number,
         name: t.string,
       }),
     },

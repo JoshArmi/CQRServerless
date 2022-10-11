@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  CQRServerless
+
+Transform: "AWS::Serverless-2016-10-31"
+
+Globals:
+  Function:
+    Architectures:
+      - x86_64
+    Runtime: nodejs16.x
+    MemorySize: 128
+    Timeout: 3
+    Tracing: Active
+
+Resources:
+  CreateAccount:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: createAccount.commandHandler
+      Description: Handles create account commands
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref EventStore
+      Environment:
+        Variables:
+          EVENT_STORE: !Ref EventStore
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/entrypoints/createAccount.ts
+
+  EventStore:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: aggregateId
+          AttributeType: S
+        - AttributeName: aggregateVersion
+          AttributeType: N
+        - AttributeName: TYPE
+          AttributeType: S
+        - AttributeName: eventId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: aggregateId
+          KeyType: HASH
+        - AttributeName: aggregateVersion
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: byEventId
+          KeySchema:
+            - AttributeName: TYPE
+              KeyType: HASH
+            - AttributeName: eventId
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      SSESpecification:
+        SSEEnabled: true
+      TableName: EventStore
+
+Outputs:
+  CreateAccount:
+    Value: !Ref CreateAccount

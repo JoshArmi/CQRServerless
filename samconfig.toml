@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "CQRServerless"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-p1fgmu0q2bci"
+s3_prefix = "CQRServerless"
+region = "ap-southeast-2"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

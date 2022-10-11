@@ -6,13 +6,6 @@ import { getAggregateEvents, getAllEvents, storeEvents } from '../../src/drivers
 import { AccountCreated } from '../../src/entities/types';
 import KSUID from 'ksuid';
 
-AWS.config.update({
-  region: 'eu-west-1',
-  dynamodb: {
-    endpoint: 'http://localhost:4566',
-  },
-});
-
 const accountCreated: AccountCreated = {
   aggregateId: v4(),
   aggregateVersion: 1,
@@ -20,76 +13,22 @@ const accountCreated: AccountCreated = {
   eventType: 'ACCOUNT_CREATED',
   eventVersion: 1,
   metadata: {
-    amount: 10,
     name: 'Josh',
   },
 };
 
-const dynamodb = new AWS.DynamoDB();
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const storeName = 'DriverTest';
+const storeName = 'EventStore';
 
 describe('DynamoDB Driver', () => {
-  beforeAll(() => {
-    const params: AWS.DynamoDB.CreateTableInput = {
-      AttributeDefinitions: [
-        {
-          AttributeName: 'eventId',
-          AttributeType: 'S',
-        },
-        {
-          AttributeName: 'aggregateId',
-          AttributeType: 'S',
-        },
-        {
-          AttributeName: 'aggregateVersion',
-          AttributeType: 'N',
-        },
-        {
-          AttributeName: 'TYPE',
-          AttributeType: 'S',
-        },
-      ],
-      BillingMode: 'PAY_PER_REQUEST',
-      KeySchema: [
-        {
-          AttributeName: 'aggregateId',
-          KeyType: 'HASH',
-        },
-        {
-          AttributeName: 'aggregateVersion',
-          KeyType: 'RANGE',
-        },
-      ],
-      GlobalSecondaryIndexes: [
-        {
-          IndexName: 'byEventId',
-          KeySchema: [
-            {
-              AttributeName: 'TYPE',
-              KeyType: 'HASH',
-            },
-            {
-              AttributeName: 'eventId',
-              KeyType: 'RANGE',
-            },
-          ],
-          Projection: {
-            ProjectionType: 'ALL',
-          },
-        },
-      ],
-      TableName: storeName,
-    };
-    return dynamodb.createTable(params).promise();
-  });
-
-  afterAll(() => {
-    return dynamodb
-      .deleteTable({
-        TableName: storeName,
+  beforeEach(async () => {
+    const items = (await dynamodb.scan({TableName: storeName}).promise()).Items;
+    if (items) {
+      items.forEach(async (item) => {
+        await dynamodb.delete({ TableName: storeName, Key: { aggregateId: item.aggregateId, aggregateVersion: item.aggregateVersion } }).promise();
       })
-      .promise();
+    }
   });
 
   describe('Store Events', () => {
@@ -144,6 +83,24 @@ describe('DynamoDB Driver', () => {
       const response = await getAllEvents(storeName);
       if (isRight(response)) {
         expect(response.right.length).toBe(2);
+      } else {
+        fail();
+      }
+    });
+
+    test('Filters malformed event in table', async () => {
+      await dynamodb.put({
+        TableName: storeName,
+        Item: {
+          aggregateId: v4(),
+          aggregateVersion: 10,
+          TYPE: "EVENT",
+          eventId: v4()
+        }
+      }).promise()
+      const response = await getAllEvents(storeName);
+      if (isRight(response)) {
+        expect(response.right.length).toBe(0);
       } else {
         fail();
       }
