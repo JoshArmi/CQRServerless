@@ -21,6 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm i
+          apt-get install esbuild
 
       - name: Run unit tests
         run: |
