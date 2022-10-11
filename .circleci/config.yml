@@ -9,7 +9,7 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          command: npm run unittest
+          command: make unittest
           name: Run unit tests
 workflows:
   build_test:
