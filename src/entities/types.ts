@@ -1,9 +1,11 @@
 import * as t from 'io-ts';
 
 export const Account = t.type({
-    version: t.number,
-    aggregateId: t.string, name: t.string, amount: t.number
-  })
+  version: t.number,
+  aggregateId: t.string,
+  name: t.string,
+  amount: t.number,
+});
 export type Account = t.TypeOf<typeof Account>;
 export const CreateAccount = t.type(
   {
@@ -22,7 +24,7 @@ export type DepositMoney = t.TypeOf<typeof DepositMoney>;
 
 export type AccountCommands = CreateAccount | DepositMoney;
 
-export type Command = AccountCommands
+export type Command = AccountCommands;
 
 export const BaseEvent = t.type(
   {
